@@ -56,16 +56,12 @@ public class OrderDiscountCalculator : IOrderDiscountCalculator
 
     private static decimal RoundToTwoDecimalPlaces(decimal value)
     {
-        // Truncate to 2 decimal places without rounding
         decimal truncated = Math.Truncate(value * 100) / 100;
-
-        // Check if the truncated value needs adjustment
         decimal remainder = value - truncated;
-        if (remainder >= 0.005m)
+        if (remainder > 0.005m) // Changed from >= to >
         {
             truncated += 0.01m;
         }
-
         return truncated;
     }
 }
