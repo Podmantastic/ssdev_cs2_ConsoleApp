@@ -1,24 +1,23 @@
-using log4net.Core;
-using log4net.Repository.Hierarchy;
-
 namespace ConsoleApp;
 
 public class OrderProcessor: IOrderProcessor
 {
-    private readonly ILogger logger;
+    private readonly IOrderDiscountCalculator discountCalulator;
 
-    public OrderProcessor(ILogger logger)
+    public OrderProcessor(IOrderDiscountCalculator discountCalulator)
     {
-        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        this.discountCalulator = discountCalulator;
     }
 
     public void Do()
     {
-        //var orderTotal = _order.Sum(item => item.Quantity * item.UnitPrice);
-        var orderTotal = 0;
+        var order = new List<Item> {
+            new Item("Laptop", 1, 1000.00m),
+            new Item("Mouse", 3, 25.00m),
+            new Item("Keyboard", 2, 50.00m)};
 
-        logger.Log(Level.Info, $"Order total: {orderTotal:C}");
+        var totalPrice = discountCalulator.CalculateTotalPrice(order);
 
-        Console.WriteLine($"Order total: {orderTotal:C}");
+        Console.WriteLine($"Order total: {totalPrice:C}");
     }
 }

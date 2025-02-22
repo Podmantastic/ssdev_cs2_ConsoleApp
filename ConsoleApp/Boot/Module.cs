@@ -8,5 +8,7 @@ public class Module : NinjectModule
     {
         // Entry point
         Bind<IOrderProcessor>().To<OrderProcessor>().InSingletonScope();
+
+        Bind<IOrderDiscountCalculator>().To<OrderDiscountCalculator>().InSingletonScope();
     }
 }
