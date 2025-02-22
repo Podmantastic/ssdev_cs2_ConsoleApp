@@ -1,112 +1,117 @@
 ﻿using ConsoleApp;
 using NUnit.Framework;
 
+namespace ConsoleAppTest;
+
 [TestFixture]
-public class OrderDiscountCalculatorTests
+public class OrderCalculatorTests
 {
-    private OrderDiscountCalculator _orderDiscountCalculator = null!;
+    private IOrderDiscountCalculator _sut = null!;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        // Initialize the OrderDiscountCalculator before each test
-        _orderDiscountCalculator = new OrderDiscountCalculator();
+        _sut = new OrderDiscountCalculator();
     }
 
     [Test]
-    public void CalculateTotalPrice_NoItems_ReturnsZero()
+    public void CalculateTotalPrice_NullOrder_ThrowsArgumentException()
     {
-        // Arrange
+        List<Item> order = null;
+        var exception = Assert.Throws<ArgumentException>(() => _sut.CalculateTotalPrice(order));
+        Assert.That(exception.Message, Is.EqualTo("The order list cannot be null."));
+    }
+
+    [Test]
+    public void CalculateTotalPrice_EmptyOrder_ReturnsZero()
+    {
         var order = new List<Item>();
-
-        // Act
-        var totalPrice = _orderDiscountCalculator.CalculateTotalPrice(order);
-
-        // Assert
-        Assert.That(totalPrice, Is.EqualTo(0m));
+        var totalPrice = _sut.CalculateTotalPrice(order);
+        Assert.That(totalPrice, Is.EqualTo(0.00m));
     }
 
     [Test]
-    public void CalculateTotalPrice_ItemsWithoutDiscounts_ReturnsCorrectTotal()
+    public void CalculateTotalPrice_NullItemInOrder_ThrowsArgumentException()
     {
-        // Arrange
-        var order = new List<Item>
-        {
-            new("Laptop", 1, 1000m),
-            new("Keyboard", 2, 50m)
-        };
-
-        // Act
-        var totalPrice = _orderDiscountCalculator.CalculateTotalPrice(order);
-
-        // Assert
-        Assert.That(totalPrice, Is.EqualTo(1100m)); // 1000 + (2 * 50) = 1100
+        var order = new List<Item> { null };
+        var exception = Assert.Throws<ArgumentException>(() => _sut.CalculateTotalPrice(order));
+        Assert.That(exception.Message, Is.EqualTo("The order list contains a null item."));
     }
 
     [Test]
-    public void CalculateTotalPrice_ItemsWithQuantityDiscount_ReturnsCorrectTotal()
+    public void CalculateTotalPrice_NegativeQuantity_ThrowsArgumentException()
     {
-        // Arrange
-        var order = new List<Item>
-        {
-            new("Mouse", 3, 25m) // 10% discount on 3 mice
-        };
-
-        // Act
-        var totalPrice = _orderDiscountCalculator.CalculateTotalPrice(order);
-
-        // Assert
-        Assert.That(totalPrice, Is.EqualTo(67.5m)); // (3 * 25) * 0.9 = 67.5
+        var order = new List<Item> { new Item("Laptop", -1, 1000.00m) };
+        var exception = Assert.Throws<ArgumentException>(() => _sut.CalculateTotalPrice(order));
+        Assert.That(exception.Message, Is.EqualTo("Quantity and unit price must be non-negative."));
     }
 
     [Test]
-    public void CalculateTotalPrice_OrderWithBulkDiscount_ReturnsCorrectTotal()
+    public void CalculateTotalPrice_NegativeUnitPrice_ThrowsArgumentException()
     {
-        // Arrange
-        var order = new List<Item>
-        {
-            new("Laptop", 1, 1000m),
-            new("Mouse", 3, 25m), // 10% discount on mice
-            new("Keyboard", 2, 50m)
-        };
-
-        // Act
-        var totalPrice = _orderDiscountCalculator.CalculateTotalPrice(order);
-
-        // Assert
-        Assert.That(totalPrice, Is.EqualTo(1109.125m)); // 1000 + 67.5 + 100 = 1167.5; 1167.5 * 0.95 = 1109.125
+        var order = new List<Item> { new Item("Laptop", 1, -1000.00m) };
+        var exception = Assert.Throws<ArgumentException>(() => _sut.CalculateTotalPrice(order));
+        Assert.That(exception.Message, Is.EqualTo("Quantity and unit price must be non-negative."));
     }
 
     [Test]
-    public void CalculateTotalPrice_TotalExactly100_NoBulkDiscount()
+    public void CalculateTotalPrice_NoDiscounts_CalculatesCorrectTotal()
     {
-        // Arrange
         var order = new List<Item>
         {
-            new("Item1", 2, 50m) // Total = 100
+            new Item("Laptop", 1, 1000.00m),
+            new Item("Mouse", 2, 25.00m),
+            new Item("Keyboard", 1, 50.00m)
         };
-
-        // Act
-        var totalPrice = _orderDiscountCalculator.CalculateTotalPrice(order);
-
-        // Assert
-        Assert.That(totalPrice, Is.EqualTo(100m)); // No bulk discount applied
+        var totalPrice = _sut.CalculateTotalPrice(order);
+        Assert.That(totalPrice, Is.EqualTo(1100.00m));
     }
 
     [Test]
-    public void CalculateTotalPrice_AllItemsWithDiscounts_ReturnsCorrectTotal()
+    public void CalculateTotalPrice_QuantityDiscountForOneItem_CalculatesCorrectTotal()
     {
-        // Arrange
         var order = new List<Item>
         {
-            new("Item1", 3, 100m), // 10% discount
-            new("Item2", 4, 50m)   // 10% discount
+            new Item("Laptop", 1, 1000.00m),
+            new Item("Mouse", 3, 25.00m), // 10% discount
+            new Item("Keyboard", 2, 50.00m)
         };
+        var totalPrice = _sut.CalculateTotalPrice(order);
+        Assert.That(totalPrice, Is.EqualTo(1109.12m)); // 1167.50 - 5% = 1109.12
+    }
 
-        // Act
-        var totalPrice = _orderDiscountCalculator.CalculateTotalPrice(order);
+    [Test]
+    public void CalculateTotalPrice_QuantityDiscountForAllItems_CalculatesCorrectTotal()
+    {
+        var order = new List<Item>
+        {
+            new Item("Laptop", 3, 1000.00m), // 10% discount
+            new Item("Mouse", 3, 25.00m),   // 10% discount
+            new Item("Keyboard", 3, 50.00m)  // 10% discount
+        };
+        var totalPrice = _sut.CalculateTotalPrice(order);
+        Assert.That(totalPrice, Is.EqualTo(2992.50m)); // 3150.00 - 5% = 2992.50
+    }
 
-        // Assert
-        Assert.That(totalPrice, Is.EqualTo(427.5m)); // (300 * 0.9) + (200 * 0.9) = 270 + 180 = 450; 450 * 0.95 = 427.5
+    [Test]
+    public void CalculateTotalPrice_TotalExactly100_NoOrderDiscount()
+    {
+        var order = new List<Item>
+        {
+            new Item("Laptop", 1, 100.00m)
+        };
+        var totalPrice = _sut.CalculateTotalPrice(order);
+        Assert.That(totalPrice, Is.EqualTo(100.00m));
+    }
+
+    [Test]
+    public void CalculateTotalPrice_TotalAbove100_AppliesOrderDiscount()
+    {
+        var order = new List<Item>
+        {
+            new Item("Laptop", 1, 101.00m)
+        };
+        var totalPrice = _sut.CalculateTotalPrice(order);
+        Assert.That(totalPrice, Is.EqualTo(95.95m)); // 101.00 - 5% = 95.95
     }
 }
