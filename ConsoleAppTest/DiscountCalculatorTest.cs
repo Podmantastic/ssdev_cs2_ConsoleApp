@@ -6,7 +6,7 @@ namespace ConsoleAppTest;
 [TestFixture]
 public class OrderCalculatorTests
 {
-    private IOrderDiscountCalculator _sut;
+    private IOrderDiscountCalculator _sut = null!;
 
     [SetUp]
     public void SetUp()
@@ -17,7 +17,7 @@ public class OrderCalculatorTests
     [Test]
     public void CalculateTotalPrice_NullOrder_ThrowsArgumentException()
     {
-        List<Item> order = null;
+        List<Item> order = null!;
         Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("The order list cannot be null."));
     }
 
@@ -32,21 +32,21 @@ public class OrderCalculatorTests
     [Test]
     public void CalculateTotalPrice_NullItemInOrder_ThrowsArgumentException()
     {
-        var order = new List<Item> { null };
+        var order = new List<Item> { null! };
         Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("The order list contains a null item."));
     }
 
     [Test]
     public void CalculateTotalPrice_NegativeQuantity_ThrowsArgumentException()
     {
-        var order = new List<Item> { new Item("Laptop", -1, 1000.00m) };
+        var order = new List<Item> { new("Laptop", -1, 1000.00m) };
         Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
     }
 
     [Test]
     public void CalculateTotalPrice_NegativeUnitPrice_ThrowsArgumentException()
     {
-        var order = new List<Item> { new Item("Laptop", 1, -1000.00m) };
+        var order = new List<Item> { new("Laptop", 1, -1000.00m) };
         Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
     }
 
@@ -55,9 +55,9 @@ public class OrderCalculatorTests
     {
         var order = new List<Item>
         {
-            new Item("Laptop", 1, 1000.00m),
-            new Item("Mouse", 2, 25.00m),
-            new Item("Keyboard", 1, 50.00m)
+            new("Laptop", 1, 1000.00m),
+            new("Mouse", 2, 25.00m),
+            new("Keyboard", 1, 50.00m)
         };
         var totalPrice = _sut.CalculateTotalPrice(order);
         Assert.That(totalPrice, Is.EqualTo(1045.00m));
@@ -68,9 +68,9 @@ public class OrderCalculatorTests
     {
         var order = new List<Item>
         {
-            new Item("Laptop", 1, 1000.00m),
-            new Item("Mouse", 3, 25.00m), // 10% discount
-            new Item("Keyboard", 2, 50.00m)
+            new("Laptop", 1, 1000.00m),
+            new("Mouse", 3, 25.00m), // 10% discount
+            new("Keyboard", 2, 50.00m)
         };
         var totalPrice = _sut.CalculateTotalPrice(order);
         Assert.That(totalPrice, Is.EqualTo(1109.12m));
@@ -81,9 +81,9 @@ public class OrderCalculatorTests
     {
         var order = new List<Item>
         {
-            new Item("Laptop", 3, 1000.00m), // 10% discount
-            new Item("Mouse", 3, 25.00m),     // 10% discount
-            new Item("Keyboard", 3, 50.00m)  // 10% discount
+            new("Laptop", 3, 1000.00m), // 10% discount
+            new("Mouse", 3, 25.00m),     // 10% discount
+            new("Keyboard", 3, 50.00m)  // 10% discount
         };
         var totalPrice = _sut.CalculateTotalPrice(order);
         Assert.That(totalPrice, Is.EqualTo(2757.37m));
@@ -94,7 +94,7 @@ public class OrderCalculatorTests
     {
         var order = new List<Item>
         {
-            new Item("Laptop", 1, 100.00m)
+            new("Laptop", 1, 100.00m)
         };
         var totalPrice = _sut.CalculateTotalPrice(order);
         Assert.That(totalPrice, Is.EqualTo(100.00m));
@@ -105,7 +105,7 @@ public class OrderCalculatorTests
     {
         var order = new List<Item>
         {
-            new Item("Laptop", 1, 101.00m)
+            new("Laptop", 1, 101.00m)
         };
         var totalPrice = _sut.CalculateTotalPrice(order);
         Assert.That(totalPrice, Is.EqualTo(95.95m));
@@ -117,7 +117,7 @@ public class OrderCalculatorTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Test Item", 1, 100.125m) // Total price will be 100.125
+            new("Test Item", 1, 100.125m) // Total price will be 100.125
         };
 
         // Act
