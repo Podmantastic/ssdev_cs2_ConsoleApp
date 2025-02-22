@@ -1,0 +1,91 @@
+using ConsoleApp;
+using Moq;
+using NUnit.Framework;
+
+namespace ConsoleAppTest;
+
+[TestFixture]
+public class OrderProcessorTests
+{
+    [Test]
+    public void Do_ShouldCallCalculateTotalPrice_WithCorrectOrder()
+    {
+        // Arrange
+        var mockDiscountCalculator = new Mock<IOrderDiscountCalculator>();
+        var orderProcessor = new OrderProcessor(mockDiscountCalculator.Object);
+
+        var expectedOrder = new List<Item>
+        {
+            new Item("Laptop", 1, 1000.00m),
+            new Item("Mouse", 3, 25.00m),
+            new Item("Keyboard", 2, 50.00m)
+        };
+
+        mockDiscountCalculator
+            .Setup(calculator => calculator.CalculateTotalPrice(It.IsAny<List<Item>>()))
+            .Returns(1109.12m); // Mock the return value
+
+        // Act
+        orderProcessor.Do();
+
+        // Assert
+        mockDiscountCalculator.Verify(
+            calculator => calculator.CalculateTotalPrice(It.Is<List<Item>>(order =>
+                order.Count == expectedOrder.Count &&
+                order[0].Name == expectedOrder[0].Name &&
+                order[1].Name == expectedOrder[1].Name &&
+                order[2].Name == expectedOrder[2].Name)),
+            Times.Once);
+
+        // Alternatively, using Assert.That
+        Assert.That(mockDiscountCalculator.Invocations.Count, Is.EqualTo(1), "CalculateTotalPrice should be called once.");
+    }
+
+    [Test]
+    public void Do_ShouldWriteCorrectTotalPriceToConsole()
+    {
+        // Arrange
+        var mockDiscountCalculator = new Mock<IOrderDiscountCalculator>();
+        var orderProcessor = new OrderProcessor(mockDiscountCalculator.Object);
+
+        var expectedTotalPrice = 1109.12m;
+        mockDiscountCalculator
+            .Setup(calculator => calculator.CalculateTotalPrice(It.IsAny<List<Item>>()))
+            .Returns(expectedTotalPrice); // Mock the return value
+
+        using (var consoleOutput = new ConsoleOutput())
+        {
+            // Act
+            orderProcessor.Do();
+
+            // Assert
+            string consoleText = consoleOutput.GetOutput();
+            Assert.That(consoleText, Is.EqualTo($"Order total: $1,109.12\n"), "Console output should match the expected total price.");
+        }
+    }
+}
+
+// Helper class to capture console output
+public class ConsoleOutput : IDisposable
+{
+    private readonly System.IO.StringWriter stringWriter;
+    private readonly System.IO.TextWriter originalOutput;
+
+    public ConsoleOutput()
+    {
+        stringWriter = new System.IO.StringWriter();
+        originalOutput = Console.Out;
+        Console.SetOut(stringWriter);
+    }
+
+    public string GetOutput()
+    {
+        return stringWriter.ToString();
+    }
+
+    public void Dispose()
+    {
+        Console.SetOut(originalOutput);
+        stringWriter.Dispose();
+    }
+}

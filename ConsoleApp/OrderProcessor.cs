@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace ConsoleApp;
 
 public class OrderProcessor: IOrderProcessor
@@ -18,6 +20,6 @@ public class OrderProcessor: IOrderProcessor
 
         var totalPrice = discountCalulator.CalculateTotalPrice(order);
 
-        Console.WriteLine($"Order total: $ {totalPrice}");
+        Console.WriteLine($"Order total: {totalPrice.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))}");
     }
 }
