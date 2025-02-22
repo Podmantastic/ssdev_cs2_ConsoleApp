@@ -18,6 +18,6 @@ public class OrderProcessor: IOrderProcessor
 
         var totalPrice = discountCalulator.CalculateTotalPrice(order);
 
-        Console.WriteLine($"Order total: {totalPrice:C}");
+        Console.WriteLine($"Order total: $ {totalPrice}");
     }
 }
