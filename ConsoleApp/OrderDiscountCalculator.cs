@@ -58,7 +58,7 @@ public class OrderDiscountCalculator : IOrderDiscountCalculator
     {
         decimal truncated = Math.Truncate(value * 100) / 100;
         decimal remainder = value - truncated;
-        if (remainder > 0.005m) // Changed from >= to >
+        if (remainder > 0.005m)
         {
             truncated += 0.01m;
         }

@@ -110,4 +110,20 @@ public class OrderCalculatorTests
         var totalPrice = _sut.CalculateTotalPrice(order);
         Assert.That(totalPrice, Is.EqualTo(95.95m));
     }
+
+        [Test]
+    public void CalculateTotalPrice_ShouldHandleExactFractionalPart()
+    {
+        // Arrange
+        var order = new List<Item>
+        {
+            new Item("Test Item", 1, 100.125m) // Total price will be 100.125
+        };
+
+        // Act
+        var totalPrice = _sut.CalculateTotalPrice(order);
+
+        // Assert
+        Assert.That(totalPrice, Is.EqualTo(95.12m));
+    }
 }
