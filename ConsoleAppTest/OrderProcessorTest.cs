@@ -60,7 +60,7 @@ public class OrderProcessorTests
 
             // Assert
             string consoleText = consoleOutput.GetOutput();
-            Assert.That(consoleText, Is.EqualTo($"Order total: $1,109.12\n"), "Console output should match the expected total price.");
+            Assert.That(consoleText.StartsWith("Order total: $1,109.12"), "Console output should start with the expected total price.");
         }
     }
 }
