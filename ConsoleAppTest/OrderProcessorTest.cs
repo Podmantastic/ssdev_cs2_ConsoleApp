@@ -1,6 +1,6 @@
-using ConsoleApp;
 using Moq;
 using NUnit.Framework;
+using Ssdev_Cs2_ConsoleApp;
 
 namespace ConsoleAppTest;
 
@@ -22,7 +22,7 @@ public class OrderProcessorTests
         };
 
         mockDiscountCalculator
-            .Setup(calculator => calculator.CalculateTotalPrice(It.IsAny<List<Item>>()))
+            .Setup(calculator => calculator.Do(It.IsAny<List<Item>>()))
             .Returns(1109.12m); // Mock the return value
 
         // Act
@@ -30,7 +30,7 @@ public class OrderProcessorTests
 
         // Assert
         mockDiscountCalculator.Verify(
-            calculator => calculator.CalculateTotalPrice(It.Is<List<Item>>(order =>
+            calculator => calculator.Do(It.Is<List<Item>>(order =>
                 order.Count == expectedOrder.Count &&
                 order[0].Name == expectedOrder[0].Name &&
                 order[1].Name == expectedOrder[1].Name &&
@@ -50,18 +50,16 @@ public class OrderProcessorTests
 
         var expectedTotalPrice = 1109.12m;
         mockDiscountCalculator
-            .Setup(calculator => calculator.CalculateTotalPrice(It.IsAny<List<Item>>()))
+            .Setup(calculator => calculator.Do(It.IsAny<List<Item>>()))
             .Returns(expectedTotalPrice); // Mock the return value
 
-        using (var consoleOutput = new ConsoleOutput())
-        {
-            // Act
-            orderProcessor.Do();
+        using var consoleOutput = new ConsoleOutput();
+        // Act
+        orderProcessor.Do();
 
-            // Assert
-            string consoleText = consoleOutput.GetOutput();
-            Assert.That(consoleText.StartsWith("Order total: $1,109.12"), "Console output should start with the expected total price.");
-        }
+        // Assert
+        string consoleText = consoleOutput.GetOutput();
+        Assert.That(consoleText.Contains("Order total: $1,109.12"), "Console output should start with the expected total price.");
     }
 }
 

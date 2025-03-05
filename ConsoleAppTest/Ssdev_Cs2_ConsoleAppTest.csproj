@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp\ConsoleApp.csproj" />
+    <ProjectReference Include="../ConsoleApp/Ssdev_Cs2_ConsoleApp.csproj" />
   </ItemGroup>
 
 </Project>

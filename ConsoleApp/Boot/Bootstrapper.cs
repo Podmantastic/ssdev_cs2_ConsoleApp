@@ -1,14 +1,13 @@
 ﻿using Ninject;
 
-namespace ConsoleApp.Boot
-{
-    internal class Bootstrapper
-    {
-        public static IOrderProcessor ResolveGenerator()
-        {
-            var kernel = new StandardKernel(new NinjectSettings(), new Module());
+namespace Ssdev_Cs2_ConsoleApp.Boot;
 
-            return kernel.Get<IOrderProcessor>();
-        }
+internal class Bootstrapper
+{
+    public static IOrderProcessor ResolveGenerator()
+    {
+        var kernel = new StandardKernel(new NinjectSettings(), new Module());
+
+        return kernel.Get<IOrderProcessor>();
     }
 }

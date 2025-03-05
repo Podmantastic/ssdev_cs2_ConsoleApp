@@ -1,6 +1,6 @@
 ﻿using Ninject.Modules;
 
-namespace ConsoleApp.Boot;
+namespace Ssdev_Cs2_ConsoleApp.Boot;
 
 public class Module : NinjectModule
 {

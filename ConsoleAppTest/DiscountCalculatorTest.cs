@@ -1,5 +1,5 @@
-﻿using ConsoleApp;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using Ssdev_Cs2_ConsoleApp;
 
 namespace ConsoleAppTest;
 
@@ -18,14 +18,14 @@ public class OrderCalculatorTests
     public void CalculateTotalPrice_NullOrder_ThrowsArgumentException()
     {
         List<Item> order = null!;
-        Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("The order list cannot be null."));
+        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("The order list cannot be null."));
     }
 
     [Test]
     public void CalculateTotalPrice_EmptyOrder_ReturnsZero()
     {
         var order = new List<Item>();
-        var totalPrice = _sut.CalculateTotalPrice(order);
+        var totalPrice = _sut.Do(order);
         Assert.That(totalPrice, Is.EqualTo(0.00m));
     }
 
@@ -33,21 +33,21 @@ public class OrderCalculatorTests
     public void CalculateTotalPrice_NullItemInOrder_ThrowsArgumentException()
     {
         var order = new List<Item> { null! };
-        Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("The order list contains a null item."));
+        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("The order list contains a null item."));
     }
 
     [Test]
     public void CalculateTotalPrice_NegativeQuantity_ThrowsArgumentException()
     {
         var order = new List<Item> { new("Laptop", -1, 1000.00m) };
-        Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
+        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
     }
 
     [Test]
     public void CalculateTotalPrice_NegativeUnitPrice_ThrowsArgumentException()
     {
         var order = new List<Item> { new("Laptop", 1, -1000.00m) };
-        Assert.That(() => _sut.CalculateTotalPrice(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
+        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
     }
 
     [Test]
@@ -59,7 +59,7 @@ public class OrderCalculatorTests
             new("Mouse", 2, 25.00m),
             new("Keyboard", 1, 50.00m)
         };
-        var totalPrice = _sut.CalculateTotalPrice(order);
+        var totalPrice = _sut.Do(order);
         Assert.That(totalPrice, Is.EqualTo(1045.00m));
     }
 
@@ -72,7 +72,7 @@ public class OrderCalculatorTests
             new("Mouse", 3, 25.00m), // 10% discount
             new("Keyboard", 2, 50.00m)
         };
-        var totalPrice = _sut.CalculateTotalPrice(order);
+        var totalPrice = _sut.Do(order);
         Assert.That(totalPrice, Is.EqualTo(1109.12m));
     }
 
@@ -85,7 +85,7 @@ public class OrderCalculatorTests
             new("Mouse", 3, 25.00m),     // 10% discount
             new("Keyboard", 3, 50.00m)  // 10% discount
         };
-        var totalPrice = _sut.CalculateTotalPrice(order);
+        var totalPrice = _sut.Do(order);
         Assert.That(totalPrice, Is.EqualTo(2757.37m));
     }
 
@@ -96,7 +96,7 @@ public class OrderCalculatorTests
         {
             new("Laptop", 1, 100.00m)
         };
-        var totalPrice = _sut.CalculateTotalPrice(order);
+        var totalPrice = _sut.Do(order);
         Assert.That(totalPrice, Is.EqualTo(100.00m));
     }
 
@@ -107,7 +107,7 @@ public class OrderCalculatorTests
         {
             new("Laptop", 1, 101.00m)
         };
-        var totalPrice = _sut.CalculateTotalPrice(order);
+        var totalPrice = _sut.Do(order);
         Assert.That(totalPrice, Is.EqualTo(95.95m));
     }
 
@@ -121,7 +121,7 @@ public class OrderCalculatorTests
         };
 
         // Act
-        var totalPrice = _sut.CalculateTotalPrice(order);
+        var totalPrice = _sut.Do(order);
 
         // Assert
         Assert.That(totalPrice, Is.EqualTo(95.12m));

@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace ConsoleApp;
+namespace Ssdev_Cs2_ConsoleApp;
 
 public class OrderProcessor: IOrderProcessor
 {
@@ -13,12 +13,15 @@ public class OrderProcessor: IOrderProcessor
 
     public void Do()
     {
-        var order = new List<Item> {
+        List<Item> order = [
             new("Laptop", 1, 1000.00m),
             new("Mouse", 3, 25.00m),
-            new("Keyboard", 2, 50.00m)};
+            new("Keyboard", 2, 50.00m)];
 
-        var totalPrice = discountCalulator.CalculateTotalPrice(order);
+        var totalPriceBeforeDiscount = order.Sum(item => item.Quantity * item.UnitPrice);
+        Console.WriteLine($"Order total before discount: {totalPriceBeforeDiscount.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))}");
+
+        var totalPrice = discountCalulator.Do(order);
 
         Console.WriteLine($"Order total: {totalPrice.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))}");
     }

@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp;
+﻿namespace Ssdev_Cs2_ConsoleApp;
 
 public interface IOrderProcessor
 {

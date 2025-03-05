@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp;
+﻿namespace Ssdev_Cs2_ConsoleApp;
 
 public class OrderDiscountCalculator : IOrderDiscountCalculator
 {
@@ -11,7 +11,7 @@ public class OrderDiscountCalculator : IOrderDiscountCalculator
     /// <exception cref="ArgumentException">
     /// Thrown when the order list is null, contains a null item, or when any item's quantity or unit price is negative.
     /// </exception>
-    public decimal CalculateTotalPrice(List<Item> order)
+    public decimal Do(List<Item> order)
     {
         if (order == null)
         {

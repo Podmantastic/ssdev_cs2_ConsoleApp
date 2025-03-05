@@ -1,4 +1,4 @@
-namespace ConsoleApp;
+namespace Ssdev_Cs2_ConsoleApp;
 
 /// <summary>
 /// Represents an item with a name, quantity, and unit price.
