@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using Ssdev_Cs2_ConsoleApp;
+using Ssdev_Cs2_ConsoleApp.DTO;
 
 namespace Ssdev_Cs2_ConsoleAppTest;
 

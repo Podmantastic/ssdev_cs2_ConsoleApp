@@ -1,4 +1,5 @@
 using Ssdev_Cs2_ConsoleApp.Discounts;
+using Ssdev_Cs2_ConsoleApp.DTO;
 
 namespace Ssdev_Cs2_ConsoleApp.DiscountStrategies;
 

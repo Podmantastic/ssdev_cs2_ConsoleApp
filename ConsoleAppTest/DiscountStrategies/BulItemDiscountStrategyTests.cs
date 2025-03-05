@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using Ssdev_Cs2_ConsoleApp;
 using Ssdev_Cs2_ConsoleApp.Discounts;
 using Ssdev_Cs2_ConsoleApp.DiscountStrategies;
+using Ssdev_Cs2_ConsoleApp.DTO;
 
 namespace Ssdev_Cs2_ConsoleAppTest.DiscountStrategies;
 
@@ -36,8 +36,8 @@ public class BulItemDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 1, 10.0m),
-            new Item("Product B", 2, 20.0m)
+            new("Product A", 1, 10.0m),
+            new("Product B", 2, 20.0m)
         };
         
         // Act
@@ -53,8 +53,8 @@ public class BulItemDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 3, 10.0m),
-            new Item("Product B", 1, 20.0m)
+            new("Product A", 3, 10.0m),
+            new("Product B", 1, 20.0m)
         };
         
         // Act
@@ -70,9 +70,9 @@ public class BulItemDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 3, 10.0m),
-            new Item("Product B", 4, 20.0m),
-            new Item("Product C", 2, 30.0m)
+            new("Product A", 3, 10.0m),
+            new("Product B", 4, 20.0m),
+            new("Product C", 2, 30.0m)
         };
         
         // Act
@@ -88,8 +88,8 @@ public class BulItemDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 3, 9.99m),
-            new Item("Product B", 5, 19.95m)
+            new("Product A", 3, 9.99m),
+            new("Product B", 5, 19.95m)
         };
         
         // Act

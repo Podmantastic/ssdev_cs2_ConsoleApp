@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using Ssdev_Cs2_ConsoleApp;
 using Ssdev_Cs2_ConsoleApp.Discounts;
 using Ssdev_Cs2_ConsoleApp.DiscountStrategies;
+using Ssdev_Cs2_ConsoleApp.DTO;
 
 namespace Ssdev_Cs2_ConsoleAppTest.DiscountStrategies;
 
@@ -36,8 +36,8 @@ public class OrderTotalDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 1, 50.0m),
-            new Item("Product B", 2, 20.0m)
+            new("Product A", 1, 50.0m),
+            new("Product B", 2, 20.0m)
         };
         // Total: 50 + (2*20) = 90, which is < 100
         
@@ -54,7 +54,7 @@ public class OrderTotalDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 2, 50.0m)
+            new("Product A", 2, 50.0m)
         };
         // Total: 2*50 = 100, which is == 100
         
@@ -71,7 +71,7 @@ public class OrderTotalDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 2, 60.0m)
+            new("Product A", 2, 60.0m)
         };
         // Total: 2*60 = 120, which is > 100
         
@@ -88,9 +88,9 @@ public class OrderTotalDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 3, 20.0m),
-            new Item("Product B", 2, 30.0m),
-            new Item("Product C", 1, 15.0m)
+            new("Product A", 3, 20.0m),
+            new("Product B", 2, 30.0m),
+            new("Product C", 1, 15.0m)
         };
         // Total: (3*20) + (2*30) + (1*15) = 60 + 60 + 15 = 135, which is > 100
         
@@ -107,8 +107,8 @@ public class OrderTotalDiscountStrategyTests
         // Arrange
         var order = new List<Item>
         {
-            new Item("Product A", 4, 24.99m),
-            new Item("Product B", 1, 9.95m)
+            new("Product A", 4, 24.99m),
+            new("Product B", 1, 9.95m)
         };
         // Total: (4*24.99) + (1*9.95) = 99.96 + 9.95 = 109.91, which is > 100
         
