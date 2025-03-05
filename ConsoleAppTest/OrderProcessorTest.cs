@@ -59,7 +59,7 @@ public class OrderProcessorTests
 
         // Assert
         string consoleText = consoleOutput.GetOutput();
-        Assert.That(consoleText.Contains("Order total: $1,109.12"), "Console output should start with the expected total price.");
+        Assert.That(consoleText.Contains("Order total after discount: $65.88"), "Console output should start with the expected total price.");
     }
 }
 
