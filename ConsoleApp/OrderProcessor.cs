@@ -2,14 +2,9 @@ using System.Globalization;
 
 namespace Ssdev_Cs2_ConsoleApp;
 
-public class OrderProcessor: IOrderProcessor
+public class OrderProcessor(IOrderDiscountCalculator discountCalulator) : IOrderProcessor
 {
-    private readonly IOrderDiscountCalculator discountCalulator;
-
-    public OrderProcessor(IOrderDiscountCalculator discountCalulator)
-    {
-        this.discountCalulator = discountCalulator;
-    }
+    private readonly IOrderDiscountCalculator discountCalulator = discountCalulator;
 
     public void Do()
     {
@@ -21,8 +16,7 @@ public class OrderProcessor: IOrderProcessor
         var totalPriceBeforeDiscount = order.Sum(item => item.Quantity * item.UnitPrice);
         Console.WriteLine($"Order total before discount: {totalPriceBeforeDiscount.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))}");
 
-        var totalPrice = discountCalulator.Do(order);
-
-        Console.WriteLine($"Order total: {totalPrice.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))}");
+        var totalPriceAfterDiscount = totalPriceBeforeDiscount - discountCalulator.Do(order);
+        Console.WriteLine($"Order total after discount: {totalPriceAfterDiscount.ToString("C", CultureInfo.CreateSpecificCulture("en-US"))}");
     }
 }

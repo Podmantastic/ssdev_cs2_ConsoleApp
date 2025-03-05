@@ -2,7 +2,7 @@ using Moq;
 using NUnit.Framework;
 using Ssdev_Cs2_ConsoleApp;
 
-namespace ConsoleAppTest;
+namespace Ssdev_Cs2_ConsoleAppTest;
 
 [TestFixture]
 public class OrderProcessorTests
@@ -14,12 +14,12 @@ public class OrderProcessorTests
         var mockDiscountCalculator = new Mock<IOrderDiscountCalculator>();
         var orderProcessor = new OrderProcessor(mockDiscountCalculator.Object);
 
-        var expectedOrder = new List<Item>
-        {
+        List<Item> expectedOrder =
+        [
             new("Laptop", 1, 1000.00m),
             new("Mouse", 3, 25.00m),
             new("Keyboard", 2, 50.00m)
-        };
+        ];
 
         mockDiscountCalculator
             .Setup(calculator => calculator.Do(It.IsAny<List<Item>>()))
@@ -66,12 +66,12 @@ public class OrderProcessorTests
 // Helper class to capture console output
 public class ConsoleOutput : IDisposable
 {
-    private readonly System.IO.StringWriter stringWriter;
-    private readonly System.IO.TextWriter originalOutput;
+    private readonly StringWriter stringWriter;
+    private readonly TextWriter originalOutput;
 
     public ConsoleOutput()
     {
-        stringWriter = new System.IO.StringWriter();
+        stringWriter = new StringWriter();
         originalOutput = Console.Out;
         Console.SetOut(stringWriter);
     }

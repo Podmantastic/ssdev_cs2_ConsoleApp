@@ -2,75 +2,50 @@
 
 public class OrderDiscountCalculator : IOrderDiscountCalculator
 {
-    /// <summary>
-    /// Calculates the total price of an order, applying bulk discounts for individual items
-    /// and an overall discount for the total order if applicable.
-    /// </summary>
-    /// <param name="order">A list of items in the order.</param>
-    /// <returns>The total price of the order after applying discounts.</returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when the order list is null, contains a null item, or when any item's quantity or unit price is negative.
-    /// </exception>
     public decimal Do(List<Item> order)
     {
-        if (order == null)
-        {
-            throw new ArgumentException("The order list cannot be null.");
-        }
+        ValidateOrderItems(order);
 
-        if (order.Count == 0)
-        {
-            return 0.00m;
-        }
+        // Calculate total order value before discounts
+        decimal totalOrderValue = order.Sum(item => item.UnitPrice * item.Quantity);
 
-        decimal totalPrice = 0;
-
-        // Step 1: Calculate the total price for each item
-        foreach (var item in order)
-        {
-            // Input validation: Check if the item is null
-            if (item == null)
+        // Rule 1: 10% off items with 3 or more units
+        var itemDiscounts = order
+            .Where(item => item.Quantity >= 3)
+            .Select(item =>
             {
-                throw new ArgumentException("The order list contains a null item.");
-            }
+                decimal itemDiscount = item.UnitPrice * 0.10m;
+                return itemDiscount;
+            })
+            .Sum();
 
-            // Input validation: Check if quantity or unit price is negative
-            if (item.Quantity < 0 || item.UnitPrice < 0)
-            {
-                throw new ArgumentException("Quantity and unit price must be non-negative.");
-            }
+        // Rule 2: 5% off entire order if total exceeds $100
+        decimal orderLevelDiscount = totalOrderValue > 100
+            ? totalOrderValue * 0.05m
+            : 0;
 
-            decimal itemTotal = item.Quantity * item.UnitPrice;
-
-            // Apply bulk discount if applicable
-            if (item.Quantity >= 3)
-            {
-                itemTotal *= 0.90m; // 10% discount
-            }
-
-            totalPrice += itemTotal;
-        }
-
-        // Step 2: Apply order total discount if applicable
-        if (totalPrice > 100)
-        {
-            totalPrice *= 0.95m; // 5% discount
-        }
-
-        // Step 3: Manually round to 2 decimal places
-        totalPrice = RoundToTwoDecimalPlaces(totalPrice);
-
-        return totalPrice;
+        return Math.Round(itemDiscounts + orderLevelDiscount, 2);
     }
 
-    private static decimal RoundToTwoDecimalPlaces(decimal value)
+
+    private static void ValidateOrderItems(List<Item> order)
     {
-        decimal truncated = Math.Truncate(value * 100) / 100;
-        decimal remainder = value - truncated;
-        if (remainder > 0.005m)
+        // Check for null or empty list
+        if (order == null) throw new ArgumentNullException(nameof(order), "Order items list cannot be null.");
+
+        if (order.Count == 0) throw new ArgumentException("Order items list cannot be empty.", nameof(order));
+
+        // Validate each order item
+        foreach (var item in order)
         {
-            truncated += 0.01m;
+            // Check item name
+            if (string.IsNullOrWhiteSpace(item.Name)) throw new ArgumentException("Item name cannot be null or empty.", nameof(item.Name));
+
+            // Check unit price
+            if (item.UnitPrice < 0) throw new ArgumentException($"Unit price for {item.Name} cannot be negative.", nameof(item.UnitPrice));
+
+            // Check quantity
+            if (item.Quantity < 0) throw new ArgumentException($"Quantity for {item.Name} cannot be negative.", nameof(item.Quantity));
         }
-        return truncated;
     }
 }

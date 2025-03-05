@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Ssdev_Cs2_ConsoleApp;
 
-namespace ConsoleAppTest;
+namespace Ssdev_Cs2_ConsoleAppTest;
 
 [TestFixture]
 public class OrderCalculatorTests
@@ -15,115 +15,131 @@ public class OrderCalculatorTests
     }
 
     [Test]
-    public void CalculateTotalPrice_NullOrder_ThrowsArgumentException()
-    {
-        List<Item> order = null!;
-        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("The order list cannot be null."));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_EmptyOrder_ReturnsZero()
-    {
-        var order = new List<Item>();
-        var totalPrice = _sut.Do(order);
-        Assert.That(totalPrice, Is.EqualTo(0.00m));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_NullItemInOrder_ThrowsArgumentException()
-    {
-        var order = new List<Item> { null! };
-        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("The order list contains a null item."));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_NegativeQuantity_ThrowsArgumentException()
-    {
-        var order = new List<Item> { new("Laptop", -1, 1000.00m) };
-        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_NegativeUnitPrice_ThrowsArgumentException()
-    {
-        var order = new List<Item> { new("Laptop", 1, -1000.00m) };
-        Assert.That(() => _sut.Do(order), Throws.ArgumentException.With.Message.EqualTo("Quantity and unit price must be non-negative."));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_NoDiscounts_CalculatesCorrectTotal()
-    {
-        var order = new List<Item>
-        {
-            new("Laptop", 1, 1000.00m),
-            new("Mouse", 2, 25.00m),
-            new("Keyboard", 1, 50.00m)
-        };
-        var totalPrice = _sut.Do(order);
-        Assert.That(totalPrice, Is.EqualTo(1045.00m));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_QuantityDiscountForOneItem_CalculatesCorrectTotal()
-    {
-        var order = new List<Item>
-        {
-            new("Laptop", 1, 1000.00m),
-            new("Mouse", 3, 25.00m), // 10% discount
-            new("Keyboard", 2, 50.00m)
-        };
-        var totalPrice = _sut.Do(order);
-        Assert.That(totalPrice, Is.EqualTo(1109.12m));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_QuantityDiscountForAllItems_CalculatesCorrectTotal()
-    {
-        var order = new List<Item>
-        {
-            new("Laptop", 3, 1000.00m), // 10% discount
-            new("Mouse", 3, 25.00m),     // 10% discount
-            new("Keyboard", 3, 50.00m)  // 10% discount
-        };
-        var totalPrice = _sut.Do(order);
-        Assert.That(totalPrice, Is.EqualTo(2757.37m));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_TotalExactly100_NoOrderDiscount()
-    {
-        var order = new List<Item>
-        {
-            new("Laptop", 1, 100.00m)
-        };
-        var totalPrice = _sut.Do(order);
-        Assert.That(totalPrice, Is.EqualTo(100.00m));
-    }
-
-    [Test]
-    public void CalculateTotalPrice_TotalAbove100_AppliesOrderDiscount()
-    {
-        var order = new List<Item>
-        {
-            new("Laptop", 1, 101.00m)
-        };
-        var totalPrice = _sut.Do(order);
-        Assert.That(totalPrice, Is.EqualTo(95.95m));
-    }
-
-        [Test]
-    public void CalculateTotalPrice_ShouldHandleExactFractionalPart()
+    public void Do_OrderWithThreeOrMoreUnitsOfSameItem_AppliesItemDiscount()
     {
         // Arrange
-        var order = new List<Item>
+        List<Item> items =
+        [
+            new("Product A", 3, 40.00m)
+        ];
+
+        // Act
+        decimal discount = _sut.Do(items);
+
+        // Assert
+        Assert.That(discount, Is.EqualTo(12m)); // 10% of (40 * 3) = 12
+    }
+
+    [Test]
+    public void Do_OrderTotalOver100_AppliesOrderLevelDiscount()
+    {
+        // Arrange
+        var Items = new List<Item>
         {
-            new("Test Item", 1, 100.125m) // Total price will be 100.125
+            new Item { Name = "Product A", UnitPrice = 50, Quantity = 3 }
         };
 
         // Act
-        var totalPrice = _sut.Do(order);
+        decimal discount = _sut.Do(Items);
 
         // Assert
-        Assert.That(totalPrice, Is.EqualTo(95.12m));
+        Assert.That(discount, Is.EqualTo(22.5m)); // 10% item discount (15) + 5% order discount (7.5)
+    }
+
+    [Test]
+    public void Do_OrderTotalUnder100_OnlyAppliesItemDiscount()
+    {
+        // Arrange
+        var Items = new List<Item>
+        {
+            new Item { Name = "Product A", UnitPrice = 30, Quantity = 3 }
+        };
+
+        // Act
+        decimal discount = _sut.Do(Items);
+
+        // Assert
+        Assert.That(discount, Is.EqualTo(9m)); // 10% of (30 * 3) = 9
+    }
+
+    [Test]
+    public void Do_MultipleItemsWithDifferentQuantities_CalculatesCorrectDiscount()
+    {
+        // Arrange
+        var Items = new List<Item>
+        {
+            new Item { Name = "Product A", UnitPrice = 40, Quantity = 3 },
+            new Item { Name = "Product B", UnitPrice = 30, Quantity = 2 },
+            new Item { Name = "Product C", UnitPrice = 20, Quantity = 4 }
+        };
+
+        // Act
+        decimal discount = _sut.Do(Items);
+
+        // Assert
+        decimal expectedItemDiscounts = 
+            40 * 3 * 0.10m +  // Product A: 10% off 3 units
+            20 * 4 * 0.10m +  // Product C: 10% off 4 units
+            (40 * 3 + 30 * 2 + 20 * 4) * 0.05m; // 5% order level discount
+
+        Assert.That(discount, Is.EqualTo(Math.Round(expectedItemDiscounts, 2)));
+    }
+
+    [Test]
+    public void Do_NullItems_ThrowsArgumentNullException()
+    {
+        // Arrange & Act & Assert
+        Assert.That(() => _sut.Do(null), 
+            Throws.ArgumentNullException);
+    }
+
+    [Test]
+    public void Do_EmptyItems_ThrowsArgumentException()
+    {
+        // Arrange & Act & Assert
+        Assert.That(() => _sut.Do([]), 
+            Throws.ArgumentException);
+    }
+
+    [Test]
+    public void Do_NegativeUnitPrice_ThrowsArgumentException()
+    {
+        // Arrange
+        var Items = new List<Item>
+        {
+            new Item { Name = "Product A", UnitPrice = -10, Quantity = 3 }
+        };
+
+        // Act & Assert
+        Assert.That(() => _sut.Do(Items), 
+            Throws.ArgumentException.With.Message.Contains("Unit price"));
+    }
+
+    [Test]
+    public void Do_NegativeQuantity_ThrowsArgumentException()
+    {
+        // Arrange
+        var Items = new List<Item>
+        {
+            new Item { Name = "Product A", UnitPrice = 10, Quantity = -3 }
+        };
+
+        // Act & Assert
+        Assert.That(() => _sut.Do(Items), 
+            Throws.ArgumentException.With.Message.Contains("Quantity"));
+    }
+
+    [Test]
+    public void Do_EmptyItemName_ThrowsArgumentException()
+    {
+        // Arrange
+        var Items = new List<Item>
+        {
+            new Item { Name = "", UnitPrice = 10, Quantity = 3 }
+        };
+
+        // Act & Assert
+        Assert.That(() => _sut.Do(Items), 
+            Throws.ArgumentException.With.Message.Contains("Item name"));
     }
 }
