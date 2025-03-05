@@ -2,6 +2,15 @@
 
 public class OrderDiscountCalculator : IOrderDiscountCalculator
 {
+    /// <summary>
+    /// Calculates the total price of an order, applying bulk discounts for individual items
+    /// and an overall discount for the total order if applicable.
+    /// </summary>
+    /// <param name="order">A list of items in the order.</param>
+    /// <returns>The total price of the order after applying discounts.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the order list is null, contains a null item, or when any item's quantity or unit price is negative.
+    /// </exception>
     public decimal CalculateTotalPrice(List<Item> order)
     {
         if (order == null)
