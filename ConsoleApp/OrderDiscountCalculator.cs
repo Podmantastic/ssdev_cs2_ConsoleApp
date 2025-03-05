@@ -1,30 +1,30 @@
-﻿namespace Ssdev_Cs2_ConsoleApp;
+﻿using Ssdev_Cs2_ConsoleApp.DiscountStrategies;
+
+namespace Ssdev_Cs2_ConsoleApp;
 
 public class OrderDiscountCalculator : IOrderDiscountCalculator
 {
+    private readonly IEnumerable<IDiscountStrategy> discountStrategies;
+
+    public OrderDiscountCalculator(IEnumerable<IDiscountStrategy> discountStrategies)
+    {
+        this.discountStrategies = discountStrategies;
+    }
+
+    /// <summary>
+    /// Calculates the total discount for a given order using various discount strategies.
+    /// </summary>
+    /// <param name="order">A list of items representing the order.</param>
+    /// <returns>The total discount for the order, rounded to two decimal places.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the order is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the order contains invalid items.</exception>
     public decimal Do(List<Item> order)
     {
         ValidateOrderItems(order);
 
-        // Calculate total order value before discounts
-        decimal totalOrderValue = order.Sum(item => item.UnitPrice * item.Quantity);
+        decimal totalDiscount = discountStrategies.Sum(strategy => strategy.CalculateDiscount(order));
 
-        // Rule 1: 10% off items with 3 or more units
-        var itemDiscounts = order
-            .Where(item => item.Quantity >= 3)
-            .Select(item =>
-            {
-                decimal itemDiscount = item.UnitPrice * 0.10m;
-                return itemDiscount;
-            })
-            .Sum();
-
-        // Rule 2: 5% off entire order if total exceeds $100
-        decimal orderLevelDiscount = totalOrderValue > 100
-            ? totalOrderValue * 0.05m
-            : 0;
-
-        return Math.Round(itemDiscounts + orderLevelDiscount, 2);
+        return Math.Round(totalDiscount, 2);
     }
 
 
